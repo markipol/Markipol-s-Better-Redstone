@@ -1,0 +1,46 @@
+{
+	"credit": "Made with Blockbench",
+	"textures": {
+		"0": "minecraft:block/stone",
+		"1": "markisbetterredstone:block/corner_wire_unpowered",
+		"particle": "block/stone"
+	},
+	"elements": [
+		{
+			"from": [0, 0, 0],
+			"to": [16, 1, 16],
+			"faces": {
+				"north": {"uv": [0, 0, 16, 16], "texture": "#0"},
+				"east": {"uv": [0, 0, 16, 1], "texture": "#0"},
+				"south": {"uv": [0, 0, 16, 1], "texture": "#0"},
+				"west": {"uv": [0, 0, 16, 1], "texture": "#0"},
+				"up": {"uv": [0, 0, 16, 16], "texture": "#0"},
+				"down": {"uv": [0, 0, 16, 16], "texture": "#0"}
+			}
+		},
+		{
+			"from": [7.5, 1, 7.5],
+			"to": [8.5, 2, 16],
+			"faces": {
+				"north": {"uv": [4, 6, 5, 7], "texture": "#1"},
+				"east": {"uv": [0, 0, 9, 1], "texture": "#1"},
+				"south": {"uv": [5, 6, 6, 7], "texture": "#1"},
+				"west": {"uv": [0, 1, 9, 2], "texture": "#1"},
+				"up": {"uv": [1, 11, 0, 2], "texture": "#1"},
+				"down": {"uv": [2, 2, 1, 11], "texture": "#1"}
+			}
+		},
+		{
+			"from": [8.5, 1, 7.5],
+			"to": [16, 2, 8.5],
+			"faces": {
+				"north": {"uv": [2, 2, 10, 3], "texture": "#1"},
+				"east": {"uv": [2, 6, 3, 7], "texture": "#1"},
+				"south": {"uv": [2, 3, 10, 4], "texture": "#1"},
+				"west": {"uv": [3, 6, 4, 7], "texture": "#1"},
+				"up": {"uv": [10, 5, 2, 4], "texture": "#1"},
+				"down": {"uv": [10, 5, 2, 6], "texture": "#1"}
+			}
+		}
+	]
+}

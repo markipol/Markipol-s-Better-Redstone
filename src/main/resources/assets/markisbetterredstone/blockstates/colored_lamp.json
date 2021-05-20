@@ -1,0 +1,8 @@
+{
+    "variants": {
+           "direction_of_unconnected_face=north": { "model": "markisbetterredstone:block/colored_lamp"},
+            "direction_of_unconnected_face=east": { "model": "markisbetterredstone:block/colored_lamp", "y": 90 },
+           "direction_of_unconnected_face=south": { "model": "markisbetterredstone:block/colored_lamp", "y": 180 },
+            "direction_of_unconnected_face=west": { "model": "markisbetterredstone:block/colored_lamp", "y": 270 }
+    }
+}
