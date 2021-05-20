@@ -86,6 +86,10 @@ public class ColoredLampBlock extends Block {
 		super.setPlacedBy(world, pos, state, placer, stack);
 		BlockState nbs = getLampColourFromInputs(world, pos, state);
 		world.setBlock(pos, nbs, Constants.BlockFlags.NOTIFY_NEIGHBORS + Constants.BlockFlags.BLOCK_UPDATE);
+		if (world.getBlockEntity(pos) instanceof ColoredLampTileEntity) {
+			ColoredLampTileEntity clte = (ColoredLampTileEntity) world.getBlockEntity(pos);
+			updateTileEntity(world, pos, state, clte);
+		}
 	}
 
 	@Override
@@ -132,6 +136,19 @@ public class ColoredLampBlock extends Block {
 		return lampColour.getRGB();
 
 	}
+	
+	public static int getRGBFromTE(ColoredLampTileEntity clte) {
+		int red = clte.getRed();
+		int green = clte.getGreen();
+		int blue = clte.getBlue();
+		
+		int redRGB = (int)Misc.scale2scale(red, 0, 15, 0, 255);
+		int greenRGB = (int)Misc.scale2scale(green, 0, 15, 0, 255);
+		int blueRGB = (int)Misc.scale2scale(blue, 0, 15, 0, 255);
+		
+		Color color = new Color(redRGB, greenRGB, blueRGB);
+		return color.getRGB();
+	}
 
 	private BlockState getLampColourFromInputs(World world, BlockPos pos, BlockState state) {
 		Direction facing = state.getValue(DIRECTION_OF_UNCONNECTED_FACE);
@@ -151,6 +168,9 @@ public class ColoredLampBlock extends Block {
 		        .setValue(GREEN_INTENSITY, (int) Math.round(greenIntensity))
 		        .setValue(BLUE_INTENSITY, (int) Math.round(blueIntensity));
 	}
+	
+	
+	
 
 	private void updateTileEntity(World world, BlockPos pos, BlockState state, ColoredLampTileEntity clte) {
 		Direction facing = state.getValue(DIRECTION_OF_UNCONNECTED_FACE);

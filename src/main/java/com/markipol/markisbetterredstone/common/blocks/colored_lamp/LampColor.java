@@ -13,6 +13,12 @@ public class LampColor implements net.minecraft.client.renderer.color.IBlockColo
 	        int tintIndex) {
 		
 		//Misc.log("The wheels are turning");
+		
+		if (iLightReader.getBlockEntity(blockPos) instanceof ColoredLampTileEntity) {
+			ColoredLampTileEntity clte = (ColoredLampTileEntity)iLightReader.getBlockEntity(blockPos);
+			Misc.log("The tile entity's wheels are turning");
+			return ColoredLampBlock.getRGBFromTE(clte);
+		}
 		return ColoredLampBlock.getRGBLampColour(state);
 	}
 
