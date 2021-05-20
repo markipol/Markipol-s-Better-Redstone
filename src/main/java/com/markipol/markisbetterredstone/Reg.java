@@ -2,6 +2,7 @@ package com.markipol.markisbetterredstone;
 
 import com.markipol.markisbetterredstone.common.blocks.CornerGateBlock;
 import com.markipol.markisbetterredstone.common.blocks.colored_lamp.ColoredLampBlock;
+import com.markipol.markisbetterredstone.common.blocks.colored_lamp.ColoredLampTileEntity;
 
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
@@ -37,5 +38,9 @@ public class Reg {
 	        () -> new BlockItem(CORNER_GATE_BLOCK.get(), new Item.Properties().tab(ItemGroup.TAB_REDSTONE)));
 	public static final RegistryObject<Item> COLORED_LAMP_ITEM = ITEMS.register("colored_lamp",
 	        () -> new BlockItem(COLORED_LAMP_BLOCK.get(), new Item.Properties().tab(ItemGroup.TAB_REDSTONE)));
+	
+	// Tile Entities
+	public static final RegistryObject<TileEntityType<ColoredLampTileEntity>> COLORED_LAMP_TILE_ENTITY = TILE_ENTITY_TYPES.register("colored_lamp", 
+			() -> TileEntityType.Builder.of(ColoredLampTileEntity::new,  COLORED_LAMP_BLOCK.get()).build(null));
 
 }

@@ -34,6 +34,8 @@ public class MarkisBetterRedstone
         bus.addListener(this::clientSetup);
         Reg.BLOCKS.register(bus);
         Reg.ITEMS.register(bus);
+        Reg.TILE_ENTITY_TYPES.register(bus);
+        Reg.CONTAINER_TYPES.register(bus);
 
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);

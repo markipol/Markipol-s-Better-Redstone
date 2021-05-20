@@ -12,7 +12,7 @@ public class LampColor implements net.minecraft.client.renderer.color.IBlockColo
 	public int getColor(BlockState state, IBlockDisplayReader iLightReader, BlockPos blockPos,
 	        int tintIndex) {
 		
-		Misc.log("The wheels are turning");
+		//Misc.log("The wheels are turning");
 		return ColoredLampBlock.getRGBLampColour(state);
 	}
 

@@ -2,6 +2,8 @@ package com.markipol.markisbetterredstone.common.blocks.colored_lamp;
 
 import javax.annotation.Nullable;
 
+import com.markipol.markisbetterredstone.Reg;
+
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
@@ -14,14 +16,29 @@ public class ColoredLampTileEntity extends TileEntity{
 	public int greenIntensity;
 	public int blueIntensity;
 
-	public ColoredLampTileEntity(TileEntityType<?> type) {
+	public ColoredLampTileEntity(TileEntityType<? extends TileEntity> type) {
 		super(type);
 		
 	}
+	
+	public ColoredLampTileEntity() {
+		this(Reg.COLORED_LAMP_TILE_ENTITY.get());
+	}
+	
 	public void updateColors(int red, int green, int blue) {
 		redIntensity = red;
 		greenIntensity = green;
 		blueIntensity = blue;
+	}
+	public int getRed() {
+		return redIntensity;
+	}
+	public int getGreen() {
+		return greenIntensity;
+		
+	}
+	public int getBlue() {
+		return blueIntensity;
 	}
 	@Override
 	@Nullable
