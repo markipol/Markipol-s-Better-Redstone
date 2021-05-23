@@ -1,5 +1,7 @@
 package com.markipol.markisbetterredstone.common.blocks.colored_lamp;
 
+import java.awt.Color;
+
 import com.markipol.markisbetterredstone.util.Misc;
 
 import net.minecraft.block.BlockState;
@@ -16,10 +18,10 @@ public class LampColor implements net.minecraft.client.renderer.color.IBlockColo
 		
 		if (iLightReader.getBlockEntity(blockPos) instanceof ColoredLampTileEntity) {
 			ColoredLampTileEntity clte = (ColoredLampTileEntity)iLightReader.getBlockEntity(blockPos);
-			Misc.log("The tile entity's wheels are turning");
+			//Misc.log("The tile entity's wheels are turning");
 			return ColoredLampBlock.getRGBFromTE(clte);
 		}
-		return ColoredLampBlock.getRGBLampColour(state);
+		return new Color(255,255,255).getRGB();
 	}
 
 }

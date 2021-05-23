@@ -21,7 +21,7 @@ public class CornerGateBlock extends HorizontalBlock {
 	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
 
-		builder.add(BlockStateProperties.POWER, INPUT, OUTPUT);
+		//builder.add(BlockStateProperties.POWER, INPUT, OUTPUT);
 	}
 
 }

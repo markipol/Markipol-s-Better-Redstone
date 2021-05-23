@@ -4,6 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.markipol.markisbetterredstone.common.blocks.colored_lamp.LampColor;
+import com.markipol.markisbetterredstone.common.blocks.junction_gate.JunctionGateColor;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderType;
@@ -49,11 +50,13 @@ public class MarkisBetterRedstone
     private void clientSetup(final FMLClientSetupEvent event) {
     	RenderTypeLookup.setRenderLayer(Reg.COLORED_LAMP_BLOCK.get(), RenderType.cutoutMipped());
 
+    	RenderTypeLookup.setRenderLayer(Reg.JUNCTION_GATE_BLOCK.get(), RenderType.translucent());
     }
     
     
     public void onColorHandlerEvent(ColorHandlerEvent.Block event) {
     	event.getBlockColors().register(new LampColor(), Reg.COLORED_LAMP_BLOCK.get());
+    	event.getBlockColors().register(new JunctionGateColor(), Reg.JUNCTION_GATE_BLOCK.get());
     }
 
 

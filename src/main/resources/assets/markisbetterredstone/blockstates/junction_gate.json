@@ -1,0 +1,22 @@
+{
+    "variants": {
+           "north_visible=true,east_visible=false,south_visible=false,west_visible=false": { "model": "markisbetterredstone:block/junction_gate/1_north"},
+           "north_visible=true,east_visible=true,south_visible=false,west_visible=false": { "model": "markisbetterredstone:block/junction_gate/2_north_east"},
+           "north_visible=true,east_visible=false,south_visible=true,west_visible=false": { "model": "markisbetterredstone:block/junction_gate/3_north_south"},
+           "north_visible=true,east_visible=false,south_visible=false,west_visible=true": { "model": "markisbetterredstone:block/junction_gate/4_north_west"},
+           "north_visible=true,east_visible=true,south_visible=true,west_visible=false": { "model": "markisbetterredstone:block/junction_gate/5_north_east_south"},
+           "north_visible=true,east_visible=true,south_visible=false,west_visible=true": { "model": "markisbetterredstone:block/junction_gate/6_north_east_west"},
+           "north_visible=true,east_visible=false,south_visible=true,west_visible=true": { "model": "markisbetterredstone:block/junction_gate/7_north_south_west"},
+           "north_visible=true,east_visible=true,south_visible=true,west_visible=true": { "model": "markisbetterredstone:block/junction_gate/8_north_east_south_west"},
+           
+           
+           "north_visible=false,east_visible=true,south_visible=false,west_visible=false": { "model": "markisbetterredstone:block/junction_gate/9_east"},
+           "north_visible=false,east_visible=true,south_visible=true,west_visible=false": { "model": "markisbetterredstone:block/junction_gate/10_east_south"},
+           "north_visible=false,east_visible=true,south_visible=false,west_visible=true": { "model": "markisbetterredstone:block/junction_gate/11_east_west"},
+           "north_visible=false,east_visible=true,south_visible=true,west_visible=true": { "model": "markisbetterredstone:block/junction_gate/12_east_south_west"},
+           "north_visible=false,east_visible=false,south_visible=true,west_visible=false": { "model": "markisbetterredstone:block/junction_gate/13_south"},
+           "north_visible=false,east_visible=false,south_visible=true,west_visible=true": { "model": "markisbetterredstone:block/junction_gate/14_south_west"},
+           "north_visible=false,east_visible=false,south_visible=false,west_visible=true": { "model": "markisbetterredstone:block/junction_gate/15_west"},
+           "north_visible=false,east_visible=false,south_visible=false,west_visible=false": { "model": "markisbetterredstone:block/junction_gate/16_none"}
+    }
+}
