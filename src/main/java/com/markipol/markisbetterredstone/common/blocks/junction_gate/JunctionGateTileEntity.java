@@ -21,6 +21,15 @@ import net.minecraftforge.common.util.Constants;
 public class JunctionGateTileEntity extends TileEntity {
 	public List<Direction> inputDirs = new ArrayList<Direction>();
 	public List<Direction> outputDirs = new ArrayList<Direction>();
+	public boolean northVisible = false;
+	public boolean eastVisible = false;
+	public boolean southVisible = false;
+	public boolean westVisible = false;
+	
+	public boolean northIO = false;
+	public boolean eastIO = false;
+	public boolean southIO = false;
+	public boolean westIO = false;
 	public int power = 0;
 
 	public JunctionGateTileEntity(TileEntityType<? extends TileEntity> type) {
@@ -56,14 +65,48 @@ public class JunctionGateTileEntity extends TileEntity {
 //			sW(p);
 //			return;
 //		}
-		if (outputDirs.contains(d)) {
-			outputDirs.remove(d);
-			inputDirs.add(d);
-			sW(p);
-			return;
+//		if (outputDirs.contains(d)) {
+//			outputDirs.remove(d);
+//			inputDirs.add(d);
+//			sW(p);
+//			return;
+//		}
+//		inputDirs.add(d);
+//		sW(p);
+		if (!getVisibleFromDir(d)) {
+			setVisibleFromDir(d, true);
 		}
-		inputDirs.add(d);
+		setIOFromDir(d, true);
 		sW(p);
+	}
+	public boolean getVisibleFromDir(Direction d) {
+		if (d==Direction.NORTH) return northVisible;
+		if (d==Direction.EAST) return eastVisible;
+		if (d==Direction.SOUTH) return southVisible;
+		if (d==Direction.WEST) return westVisible;
+		return false;
+		
+	}
+	public boolean getIOFromDir(Direction d) {
+		if (d==Direction.NORTH) return northIO;
+		if (d==Direction.EAST) return eastIO;
+		if (d==Direction.SOUTH) return southIO;
+		if (d==Direction.WEST) return westIO;
+		return false;
+		
+	}
+	
+	public void setVisibleFromDir(Direction d, boolean ifVisible) {
+		if (d==Direction.NORTH) northVisible = ifVisible;
+		if (d==Direction.EAST) eastVisible = ifVisible;
+		if (d==Direction.SOUTH) southVisible = ifVisible;
+		if (d==Direction.WEST)  westVisible = ifVisible;
+	}
+	public void setIOFromDir(Direction d, boolean IO) {
+		if (d==Direction.NORTH) northIO = IO;
+		if (d==Direction.EAST) eastIO = IO;
+		if (d==Direction.SOUTH) southIO = IO;
+		if (d==Direction.WEST)  westIO = IO;
 	}
 
 	public void setOutput(Direction d, BlockPos p) {
@@ -132,15 +175,23 @@ public class JunctionGateTileEntity extends TileEntity {
 
 		super.save(parentNBT);
 		parentNBT.putInt("power", power);
-		parentNBT.putBoolean("northInput", inputDirs.contains(Direction.NORTH));
-		parentNBT.putBoolean("eastInput", inputDirs.contains(Direction.EAST));
-		parentNBT.putBoolean("southInput", inputDirs.contains(Direction.SOUTH));
-		parentNBT.putBoolean("westInput", inputDirs.contains(Direction.WEST));
+		CompoundNBT visibles = new CompoundNBT();
+		CompoundNBT io = new CompoundNBT();
+		
+		
+		visibles.putBoolean("north", northVisible );
+		visibles.putBoolean("east", eastVisible);
+		visibles.putBoolean("south",southVisible);
+		visibles.putBoolean("west",westVisible);
 
-		parentNBT.putBoolean("northOutput", outputDirs.contains(Direction.NORTH));
-		parentNBT.putBoolean("eastOutput", outputDirs.contains(Direction.EAST));
-		parentNBT.putBoolean("southOutput", outputDirs.contains(Direction.SOUTH));
-		parentNBT.putBoolean("westOutput", outputDirs.contains(Direction.WEST));
+		io.putBoolean("north", northIO);
+		io.putBoolean("east", eastIO);
+		io.putBoolean("south",southIO);
+		io.putBoolean("west", westIO);
+	
+		
+		parentNBT.put("visibles", visibles);
+		parentNBT.put("io", io);
 
 		return parentNBT;
 	}
@@ -151,60 +202,72 @@ public class JunctionGateTileEntity extends TileEntity {
 		power = parentNBT.getInt("power");
 		// parentNBT.getBoolean("northInput") ? inputDirs.add(Direction.NORTH) :
 		// inputDirs.remove(Direction.NORTH);
+		CompoundNBT io = (CompoundNBT) parentNBT.get("io");
+		CompoundNBT visibles = (CompoundNBT) parentNBT.get("visibles");
 		
-		//North
-		if (parentNBT.getBoolean("northInput") && !parentNBT.getBoolean("northOutput")) {
-			if (!inputDirs.contains(Direction.NORTH)) {
-				inputDirs.add(Direction.NORTH);
-			}
-			outputDirs.remove(Direction.NORTH);
-		}
-		if (!parentNBT.getBoolean("northInput") && parentNBT.getBoolean("northOutput")) {
-			if (!outputDirs.contains(Direction.NORTH)) {
-				outputDirs.add(Direction.NORTH);
-			}
-			inputDirs.remove(Direction.NORTH);
-		}
-		//East
-		if (parentNBT.getBoolean("eastInput") && !parentNBT.getBoolean("eastOutput")) {
-			if (!inputDirs.contains(Direction.EAST)) {
-				inputDirs.add(Direction.EAST);
-			}
-			outputDirs.remove(Direction.EAST);
-		}
-		if (!parentNBT.getBoolean("eastInput") && parentNBT.getBoolean("eastOutput")) {
-			if (!outputDirs.contains(Direction.EAST)) {
-				outputDirs.add(Direction.EAST);
-			}
-			inputDirs.remove(Direction.EAST);
-		}
-		//South
-		if (parentNBT.getBoolean("southInput") && !parentNBT.getBoolean("southOutput")) {
-			if (!inputDirs.contains(Direction.SOUTH)) {
-				inputDirs.add(Direction.SOUTH);
-			}
-			outputDirs.remove(Direction.SOUTH);
-		}
-		if (!parentNBT.getBoolean("southInput") && parentNBT.getBoolean("southOutput")) {
-			if (!outputDirs.contains(Direction.SOUTH)) {
-				outputDirs.add(Direction.SOUTH);
-			}
-			inputDirs.remove(Direction.SOUTH);
-		}
-		//West
-		if (parentNBT.getBoolean("westInput") && !parentNBT.getBoolean("westOutput")) {
-			if (!inputDirs.contains(Direction.WEST)) {
-				inputDirs.add(Direction.WEST);
-			}
-			outputDirs.remove(Direction.WEST);
-		}
-		if (!parentNBT.getBoolean("westInput") && parentNBT.getBoolean("westOutput")) {
-			if (!outputDirs.contains(Direction.WEST)) {
-				outputDirs.add(Direction.WEST);
-			}
-			inputDirs.remove(Direction.WEST);
-		}
+		northVisible = visibles.getBoolean("north");
+		eastVisible = visibles.getBoolean("east");
+		southVisible = visibles.getBoolean("south");
+		westVisible = visibles.getBoolean("west");
 		
+		northIO = io.getBoolean("north");
+		eastIO = io.getBoolean("east");
+		southIO = io.getBoolean("south");
+		westIO = io.getBoolean("west");
+		
+//		//North
+//		if (parentNBT.getBoolean("northInput") && !parentNBT.getBoolean("northOutput")) {
+//			if (!inputDirs.contains(Direction.NORTH)) {
+//				inputDirs.add(Direction.NORTH);
+//			}
+//			outputDirs.remove(Direction.NORTH);
+//		}
+//		if (!parentNBT.getBoolean("northInput") && parentNBT.getBoolean("northOutput")) {
+//			if (!outputDirs.contains(Direction.NORTH)) {
+//				outputDirs.add(Direction.NORTH);
+//			}
+//			inputDirs.remove(Direction.NORTH);
+//		}
+//		//East
+//		if (parentNBT.getBoolean("eastInput") && !parentNBT.getBoolean("eastOutput")) {
+//			if (!inputDirs.contains(Direction.EAST)) {
+//				inputDirs.add(Direction.EAST);
+//			}
+//			outputDirs.remove(Direction.EAST);
+//		}
+//		if (!parentNBT.getBoolean("eastInput") && parentNBT.getBoolean("eastOutput")) {
+//			if (!outputDirs.contains(Direction.EAST)) {
+//				outputDirs.add(Direction.EAST);
+//			}
+//			inputDirs.remove(Direction.EAST);
+//		}
+//		//South
+//		if (parentNBT.getBoolean("southInput") && !parentNBT.getBoolean("southOutput")) {
+//			if (!inputDirs.contains(Direction.SOUTH)) {
+//				inputDirs.add(Direction.SOUTH);
+//			}
+//			outputDirs.remove(Direction.SOUTH);
+//		}
+//		if (!parentNBT.getBoolean("southInput") && parentNBT.getBoolean("southOutput")) {
+//			if (!outputDirs.contains(Direction.SOUTH)) {
+//				outputDirs.add(Direction.SOUTH);
+//			}
+//			inputDirs.remove(Direction.SOUTH);
+//		}
+//		//West
+//		if (parentNBT.getBoolean("westInput") && !parentNBT.getBoolean("westOutput")) {
+//			if (!inputDirs.contains(Direction.WEST)) {
+//				inputDirs.add(Direction.WEST);
+//			}
+//			outputDirs.remove(Direction.WEST);
+//		}
+//		if (!parentNBT.getBoolean("westInput") && parentNBT.getBoolean("westOutput")) {
+//			if (!outputDirs.contains(Direction.WEST)) {
+//				outputDirs.add(Direction.WEST);
+//			}
+//			inputDirs.remove(Direction.WEST);
+//		}
+//		
 		
 //		//Inputs
 //
