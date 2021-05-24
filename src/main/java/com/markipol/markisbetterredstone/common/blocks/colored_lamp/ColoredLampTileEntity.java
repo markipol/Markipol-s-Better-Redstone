@@ -15,6 +15,7 @@ public class ColoredLampTileEntity extends TileEntity{
 	public int redIntensity;
 	public int greenIntensity;
 	public int blueIntensity;
+	public int light;
 
 	public ColoredLampTileEntity(TileEntityType<? extends TileEntity> type) {
 		super(type);
@@ -29,6 +30,12 @@ public class ColoredLampTileEntity extends TileEntity{
 		redIntensity = red;
 		greenIntensity = green;
 		blueIntensity = blue;
+	}
+	public void updateLight(int light) {
+		this.light = light;
+	}
+	public int getLight() {
+		return this.light;
 	}
 	public int getRed() {
 		return redIntensity;
@@ -77,6 +84,7 @@ public class ColoredLampTileEntity extends TileEntity{
 		parentNBT.putInt("redIntensity", redIntensity);
 		parentNBT.putInt("greenIntensity", greenIntensity);
 		parentNBT.putInt("blueIntensity", blueIntensity);
+		parentNBT.putInt("light", light);
 
 		return parentNBT;
 	}
@@ -87,6 +95,7 @@ public class ColoredLampTileEntity extends TileEntity{
 		redIntensity = parentNBT.getInt("redIntensity");
 		greenIntensity = parentNBT.getInt("greenIntensity");
 		blueIntensity = parentNBT.getInt("blueIntensity");
+		light = parentNBT.getInt("light");
 		
 
 
