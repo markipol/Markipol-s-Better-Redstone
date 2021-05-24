@@ -27,10 +27,7 @@ public class JunctionGateColor implements IBlockColor {
 			//Misc.log("Does it show, that is the question");
 			JunctionGateTileEntity jgte = (JunctionGateTileEntity) iLightReader.getBlockEntity(pos);
 
-			// if (!inputDirs.isEmpty())
-			inputDirs = jgte.getInputDirs();
-			// if (!outputDirs.isEmpty())
-			outputDirs = jgte.getOutputDirs();
+
 
 			// Redstone Wire color (red)
 			if (tintindex == 0) {
@@ -41,45 +38,34 @@ public class JunctionGateColor implements IBlockColor {
 			}
 			// North Entry Gate
 			if (tintindex == 1) {
+				if (jgte.getVisibleFromDir(Direction.NORTH)) {
+					return jgte.getIOFromDir(Direction.NORTH) ? BLUE : ORANGE;
+				}
+				else return new Color(12, 240, 42).getRGB();
 				//Misc.log("Purple");
-				if (inputDirs.contains(Direction.NORTH)) {
 
-					return BLUE;
-				}
-				if (outputDirs.contains(Direction.NORTH)) {
-					return ORANGE;
-				}
 
 			}
 			// East Entry
 			if (tintindex == 2) {
-				if (inputDirs.contains(Direction.EAST)) {
-
-					return BLUE;
+				if (jgte.getVisibleFromDir(Direction.EAST)) {
+					return jgte.getIOFromDir(Direction.EAST) ? BLUE : ORANGE;
 				}
-				if (outputDirs.contains(Direction.EAST)) {
-					return ORANGE;
-				}
+				else return new Color(12, 240, 42).getRGB();
 			}
 			// South Entry
 			if (tintindex == 3) {
-				if (inputDirs.contains(Direction.SOUTH)) {
-
-					return BLUE;
+				if (jgte.getVisibleFromDir(Direction.SOUTH)) {
+					return jgte.getIOFromDir(Direction.SOUTH) ? BLUE : ORANGE;
 				}
-				if (outputDirs.contains(Direction.SOUTH)) {
-					return ORANGE;
-				}
+				else return new Color(12, 240, 42).getRGB();
 			}
 			// West Entry
 			if (tintindex == 4) {
-				if (inputDirs.contains(Direction.WEST)) {
-
-					return BLUE;
+				if (jgte.getVisibleFromDir(Direction.WEST)) {
+					return jgte.getIOFromDir(Direction.WEST) ? BLUE : ORANGE;
 				}
-				if (outputDirs.contains(Direction.WEST)) {
-					return ORANGE;
-				}
+				else return new Color(12, 240, 42).getRGB();
 
 			}
 		}

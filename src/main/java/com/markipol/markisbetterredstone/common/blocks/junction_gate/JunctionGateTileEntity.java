@@ -25,7 +25,7 @@ public class JunctionGateTileEntity extends TileEntity {
 	public boolean eastVisible = false;
 	public boolean southVisible = false;
 	public boolean westVisible = false;
-	
+
 	public boolean northIO = false;
 	public boolean eastIO = false;
 	public boolean southIO = false;
@@ -54,13 +54,20 @@ public class JunctionGateTileEntity extends TileEntity {
 		return outputDirs.contains(d);
 	}
 
-	public void sW(BlockPos p) {
+	public boolean falseForOutputTrueForInput(Direction d) {
+		return getIOFromDir(d);
+	}
+	
+
+	//sW stands for Sync World (between server and client)
+	public void sW(BlockPos p, BlockState s) {
 		if (!this.level.isClientSide) {
-			this.level.sendBlockUpdated(p, this.level.getBlockState(p), this.level.getBlockState(p), Constants.BlockFlags.BLOCK_UPDATE);
+			this.level.sendBlockUpdated(p, s, s, Constants.BlockFlags.BLOCK_UPDATE);
+
 		}
 	}
 
-	public void setInput(Direction d, BlockPos p) {
+	public void setIO(Direction d, BlockPos p, boolean inputOrOutput, BlockState s) {
 //		if (inputDirs.contains(d)) {
 //			sW(p);
 //			return;
@@ -73,62 +80,101 @@ public class JunctionGateTileEntity extends TileEntity {
 //		}
 //		inputDirs.add(d);
 //		sW(p);
-		if (!getVisibleFromDir(d)) {
-			setVisibleFromDir(d, true);
-		}
-		setIOFromDir(d, true);
-		sW(p);
-	}
-	public boolean getVisibleFromDir(Direction d) {
-		if (d==Direction.NORTH) return northVisible;
-		if (d==Direction.EAST) return eastVisible;
-		if (d==Direction.SOUTH) return southVisible;
-		if (d==Direction.WEST) return westVisible;
-		return false;
-		
-	}
-	public boolean getIOFromDir(Direction d) {
-		if (d==Direction.NORTH) return northIO;
-		if (d==Direction.EAST) return eastIO;
-		if (d==Direction.SOUTH) return southIO;
-		if (d==Direction.WEST) return westIO;
-		return false;
-		
-	}
-	
-	public void setVisibleFromDir(Direction d, boolean ifVisible) {
-		if (d==Direction.NORTH) northVisible = ifVisible;
-		if (d==Direction.EAST) eastVisible = ifVisible;
-		if (d==Direction.SOUTH) southVisible = ifVisible;
-		if (d==Direction.WEST)  westVisible = ifVisible;
-	}
-	public void setIOFromDir(Direction d, boolean IO) {
-		if (d==Direction.NORTH) northIO = IO;
-		if (d==Direction.EAST) eastIO = IO;
-		if (d==Direction.SOUTH) southIO = IO;
-		if (d==Direction.WEST)  westIO = IO;
+
+//		if (!getVisibleFromDir(d)) {
+//			s = setVisible(d, true, p, s);
+//		}
+		setIOFromDir(d, inputOrOutput);
+		sW(p, s);
 	}
 
-	public void setOutput(Direction d, BlockPos p) {
-//		if (outputDirs.contains(d)) {
-//			sW(p);
+	public BlockState setVisibleAndIO(Direction d, BlockPos p, boolean inputOrOutput, BlockState s, boolean whetherVisible) {
+
+		setVisibleFromDir(d, whetherVisible);
+		s = s.setValue(JunctionGateBlock.dirToProperty(d), whetherVisible);
+
+		setIOFromDir(d, inputOrOutput);
+		sW(p,s);
+		return s;
+
+	}
+
+	public boolean getVisibleFromDir(Direction d) {
+		if (d == Direction.NORTH)
+			return northVisible;
+		if (d == Direction.EAST)
+			return eastVisible;
+		if (d == Direction.SOUTH)
+			return southVisible;
+		if (d == Direction.WEST)
+			return westVisible;
+		return false;
+
+	}
+
+	public boolean getIOFromDir(Direction d) {
+		if (d == Direction.NORTH)
+			return northIO;
+		if (d == Direction.EAST)
+			return eastIO;
+		if (d == Direction.SOUTH)
+			return southIO;
+		if (d == Direction.WEST)
+			return westIO;
+		return false;
+
+	}
+
+	public BlockState setVisible(Direction d, boolean ifVisible, BlockPos p, BlockState s) {
+		setVisibleFromDir(d, true);
+		s = s.setValue(JunctionGateBlock.dirToProperty(d), true);
+		sW(p, s);
+		return s;
+	}
+
+	public void setVisibleFromDir(Direction d, boolean ifVisible) {
+		if (d == Direction.NORTH)
+			northVisible = ifVisible;
+		if (d == Direction.EAST)
+			eastVisible = ifVisible;
+		if (d == Direction.SOUTH)
+			southVisible = ifVisible;
+		if (d == Direction.WEST)
+			westVisible = ifVisible;
+
+	}
+
+	public void setIOFromDir(Direction d, boolean IO) {
+		if (d == Direction.NORTH)
+			northIO = IO;
+		if (d == Direction.EAST)
+			eastIO = IO;
+		if (d == Direction.SOUTH)
+			southIO = IO;
+		if (d == Direction.WEST)
+			westIO = IO;
+	}
+//
+//	public void setOutput(Direction d, BlockPos p, BlockState s) {
+////		if (outputDirs.contains(d)) {
+////			sW(p);
+////			return;
+////		}
+//		if (inputDirs.contains(d)) {
+//			inputDirs.remove(d);
+//			outputDirs.add(d);
+//			
 //			return;
 //		}
-		if (inputDirs.contains(d)) {
-			inputDirs.remove(d);
-			outputDirs.add(d);
-			sW(p);
-			return;
-		}
-		outputDirs.add(d);
-		sW(p);
-	}
+//		outputDirs.add(d);
+//		sW(p, s);
+//	}
 
-	public void setEmpty(Direction d, BlockPos p) {
-
-		outputDirs.remove(d);
-		sW(p);
-	}
+//	public void setEmpty(Direction d, BlockPos p) {
+//
+//		outputDirs.remove(d);
+//		sW(p);
+//	}
 
 	public List<Direction> getOutputDirs() {
 
@@ -177,19 +223,17 @@ public class JunctionGateTileEntity extends TileEntity {
 		parentNBT.putInt("power", power);
 		CompoundNBT visibles = new CompoundNBT();
 		CompoundNBT io = new CompoundNBT();
-		
-		
-		visibles.putBoolean("north", northVisible );
+
+		visibles.putBoolean("north", northVisible);
 		visibles.putBoolean("east", eastVisible);
-		visibles.putBoolean("south",southVisible);
-		visibles.putBoolean("west",westVisible);
+		visibles.putBoolean("south", southVisible);
+		visibles.putBoolean("west", westVisible);
 
 		io.putBoolean("north", northIO);
 		io.putBoolean("east", eastIO);
-		io.putBoolean("south",southIO);
+		io.putBoolean("south", southIO);
 		io.putBoolean("west", westIO);
-	
-		
+
 		parentNBT.put("visibles", visibles);
 		parentNBT.put("io", io);
 
@@ -204,17 +248,17 @@ public class JunctionGateTileEntity extends TileEntity {
 		// inputDirs.remove(Direction.NORTH);
 		CompoundNBT io = (CompoundNBT) parentNBT.get("io");
 		CompoundNBT visibles = (CompoundNBT) parentNBT.get("visibles");
-		
+
 		northVisible = visibles.getBoolean("north");
 		eastVisible = visibles.getBoolean("east");
 		southVisible = visibles.getBoolean("south");
 		westVisible = visibles.getBoolean("west");
-		
+
 		northIO = io.getBoolean("north");
 		eastIO = io.getBoolean("east");
 		southIO = io.getBoolean("south");
 		westIO = io.getBoolean("west");
-		
+
 //		//North
 //		if (parentNBT.getBoolean("northInput") && !parentNBT.getBoolean("northOutput")) {
 //			if (!inputDirs.contains(Direction.NORTH)) {
@@ -268,7 +312,7 @@ public class JunctionGateTileEntity extends TileEntity {
 //			inputDirs.remove(Direction.WEST);
 //		}
 //		
-		
+
 //		//Inputs
 //
 //		// North
