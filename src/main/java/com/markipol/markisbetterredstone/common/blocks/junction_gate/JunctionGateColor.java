@@ -39,28 +39,35 @@ public class JunctionGateColor implements IBlockColor {
 			// North Entry Gate
 			if (tintindex == 1) {
 				if (jgte.getVisibleFromDir(Direction.NORTH)) {
-					return jgte.getIOFromDir(Direction.NORTH) ? BLUE : ORANGE;
+					//Misc.log("SPAM SPAM SPAM AND SPAM");
+					//return jgte.getIOFromDir(Direction.NORTH) ? BLUE : ORANGE;
+				    if (jgte.getIOFromDir(Direction.NORTH)) {
+				    	return BLUE;
+				    } else {
+				    	return ORANGE;
+				    }
+				    	 
 				}
 				else return new Color(12, 240, 42).getRGB();
 				//Misc.log("Purple");
 
 
 			}
-			// East Entry
+			// East IO
 			if (tintindex == 2) {
 				if (jgte.getVisibleFromDir(Direction.EAST)) {
 					return jgte.getIOFromDir(Direction.EAST) ? BLUE : ORANGE;
 				}
 				else return new Color(12, 240, 42).getRGB();
 			}
-			// South Entry
+			// South IO
 			if (tintindex == 3) {
 				if (jgte.getVisibleFromDir(Direction.SOUTH)) {
 					return jgte.getIOFromDir(Direction.SOUTH) ? BLUE : ORANGE;
 				}
 				else return new Color(12, 240, 42).getRGB();
 			}
-			// West Entry
+			// West IO
 			if (tintindex == 4) {
 				if (jgte.getVisibleFromDir(Direction.WEST)) {
 					return jgte.getIOFromDir(Direction.WEST) ? BLUE : ORANGE;

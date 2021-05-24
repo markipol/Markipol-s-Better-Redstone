@@ -46,7 +46,6 @@ public class JunctionGateBlock extends Block {
 	}
 
 	public JunctionGateBlock() {
-		// super(Block.Properties.of(Material.BUILDABLE_GLASS).noOcclusion().lightLevel(ColoredLampBlock::getLightValue));
 		super(Block.Properties.of(Material.STONE).noOcclusion());
 
 	}
@@ -97,13 +96,6 @@ public class JunctionGateBlock extends Block {
 	@Override
 	public ActionResultType use(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand,
 	        BlockRayTraceResult ray) {
-//		int xBP = pos.getX();
-//		int yBP = pos.getY();
-//		int zBP = pos.getZ();
-//		if (xBP > 0 && yBP > 0) {
-//			double xClickedPos = (ray.getLocation().x)-xBP;
-//			double yClickedPos = (ray.getLocation().y)-yBP;
-//		}
 
 		double xClickedPos = ray.getLocation().x - pos.getX();
 		double yClickedPos = ray.getLocation().y - pos.getY();
@@ -129,55 +121,23 @@ public class JunctionGateBlock extends Block {
 					BlockState newState = state;
 
 					if (!jgte.getVisibleFromDir(side)) {
-						//world.setBlockAndUpdate(pos, state.setValue(dirToProperty(side), true));
-//						jgte.setVisible(side, true, pos, state);
-//						jgte.setIO(side, pos, true);
+
 						newState = jgte.setVisibleAndIO(side, pos, true, state, true);
 
-					}
-					else {
+					} else {
 						if (jgte.getIOFromDir(side)) {
-//							jgte.setIO(side, pos, false);
+
 							newState = jgte.setVisibleAndIO(side, pos, false, state, true);
-						}
-						else {
-//							jgte.setIO(side, pos, true);
-//							jgte.setVisible(side, false, pos);
+						} else {
+
 							newState = jgte.setVisibleAndIO(side, pos, false, state, false);
-							//world.setBlockAndUpdate(pos, state.setValue(dirToProperty(side), false));
+
 						}
 					}
 					world.setBlockAndUpdate(pos, newState);
-//
-//					if (jgte.isInput(side)) {
-//						Misc.log("This side is an input, changing to output");
-//						jgte.setOutput(side, pos);
-//					} else if (jgte.isOutput(side)) {
-//						Misc.log("This side is an output, changing to empty");
-//						jgte.setEmpty(side, pos);
-//						world.setBlockAndUpdate(pos, state.setValue(dirToProperty(side), false));
-//						jgte.sW(pos);
-//					} else {
-//						Misc.log("This side is empty, changing to input");
-//						jgte.setInput(side, pos);
-//						world.setBlockAndUpdate(pos, state.setValue(dirToProperty(side), true));
-//					}
-
-//					boolean north = jgte.inputDirs.contains(Direction.NORTH)
-//					        || jgte.outputDirs.contains(Direction.NORTH);
-//					boolean east = jgte.inputDirs.contains(Direction.EAST) || jgte.outputDirs.contains(Direction.EAST);
-//					boolean south = jgte.inputDirs.contains(Direction.SOUTH)
-//					        || jgte.outputDirs.contains(Direction.SOUTH);
-//					boolean west = jgte.outputDirs.contains(Direction.WEST) || jgte.outputDirs.contains(Direction.WEST);
-
-//					Misc.log("North visible: " + north + " East visible: " + east + " South visible: " + south
-//					        + " West visible: " + west);
 
 				}
 				dirs.clear();
-
-				// Misc.log("X: " + df.format(xClickedPos) + " Y: " + yClickedPos + " Z: " +
-				// df.format(zClickedPos));
 
 			}
 
@@ -197,66 +157,11 @@ public class JunctionGateBlock extends Block {
 					boolean southV = jgte.getVisibleFromDir(Direction.SOUTH);
 					boolean westV = jgte.getVisibleFromDir(Direction.WEST);
 
-					String northS = "Empty";
-					String eastS = "Empty";
-					String westS = "Empty";
-					String southS = "Empty";
-
-//					if (northI)
-//						northS = "an Input";
-//					if (northO)
-//						northS = "an Output";
-//					if (eastI)
-//						eastS = "an Input";
-//					if (eastO)
-//						eastS = "an Output";
-//					if (southI)
-//						southS = "an Input";
-//					if (southO)
-//						southS = "an Output";
-//					if (westI)
-//						westS = "an Input";
-//					if (westO)
-//						westS = "an Output";
-
 					Misc.log("C: North: V: " + northV + " IO: " + northIO + ", East V: " + eastV + "IO: " + eastIO
 					        + ", South V: " + southV + "IO: " + southIO + ", West V: " + westV + "IO: " + westIO);
 				}
 				if (!jgte.getLevel().isClientSide) {
-//					boolean northI = jgte.inputDirs.contains(Direction.NORTH);
-//					boolean eastI = jgte.inputDirs.contains(Direction.EAST);
-//					boolean southI = jgte.inputDirs.contains(Direction.SOUTH);
-//					boolean westI = jgte.inputDirs.contains(Direction.WEST);
-//
-//					boolean northO = jgte.outputDirs.contains(Direction.NORTH);
-//					boolean eastO = jgte.outputDirs.contains(Direction.EAST);
-//					boolean southO = jgte.outputDirs.contains(Direction.SOUTH);
-//					boolean westO = jgte.outputDirs.contains(Direction.WEST);
-//
-//					String northS = "Empty";
-//					String eastS = "Empty";
-//					String westS = "Empty";
-//					String southS = "Empty";
-//
-//					if (northI)
-//						northS = "an Input";
-//					if (northO)
-//						northS = "an Output";
-//					if (eastI)
-//						eastS = "an Input";
-//					if (eastO)
-//						eastS = "an Output";
-//					if (southI)
-//						southS = "an Input";
-//					if (southO)
-//						southS = "an Output";
-//					if (westI)
-//						westS = "an Input";
-//					if (westO)
-//						westS = "an Output";
-//
-//					Misc.log("On the server, North is " + northS + ", East is " + eastS + ", South is " + southS
-//					        + ", West is " + westS);
+
 					boolean northIO = jgte.getIOFromDir(Direction.NORTH);
 					boolean eastIO = jgte.getIOFromDir(Direction.EAST);
 					boolean southIO = jgte.getIOFromDir(Direction.SOUTH);
@@ -270,7 +175,9 @@ public class JunctionGateBlock extends Block {
 					        + ", South V: " + southV + "IO: " + southIO + ", West V: " + westV + "IO: " + westIO);
 				}
 			}
+			world.setBlockAndUpdate(pos, state);
 		}
+		
 		return ActionResultType.SUCCESS;
 	}
 
