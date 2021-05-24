@@ -62,7 +62,8 @@ public class JunctionGateTileEntity extends TileEntity {
 	//sW stands for Sync World (between server and client)
 	public void sW(BlockPos p, BlockState s) {
 		if (!this.level.isClientSide) {
-			this.level.sendBlockUpdated(p, s, s, Constants.BlockFlags.BLOCK_UPDATE);
+			this.level.sendBlockUpdated(p, s, s, Constants.BlockFlags.DEFAULT_AND_RERENDER );
+			
 
 		}
 	}

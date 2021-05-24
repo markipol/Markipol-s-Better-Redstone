@@ -5,6 +5,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 import com.markipol.markisbetterredstone.util.Misc;
 
@@ -28,6 +29,8 @@ import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
+import net.minecraftforge.common.util.Constants;
 
 public class JunctionGateBlock extends Block {
 	public static final BooleanProperty NORTH_VISIBLE = BooleanProperty.create("north_visible");
@@ -92,6 +95,12 @@ public class JunctionGateBlock extends Block {
 			jgte.outputDirs.clear();
 		}
 	}
+	@Override
+	public void tick(BlockState state, ServerWorld sWorld, BlockPos pos, Random p_225534_4_) {
+		sWorld.setBlock(pos, state, Constants.BlockFlags.BLOCK_UPDATE + Constants.BlockFlags.NOTIFY_NEIGHBORS + Constants.BlockFlags.RERENDER_MAIN_THREAD);
+		sWorld.markAndNotifyBlock(pos, sWorld.getChunkAt(pos), state, state, Constants.BlockFlags.BLOCK_UPDATE + Constants.BlockFlags.NOTIFY_NEIGHBORS + Constants.BlockFlags.RERENDER_MAIN_THREAD, Constants.BlockFlags.BLOCK_UPDATE + Constants.BlockFlags.NOTIFY_NEIGHBORS + Constants.BlockFlags.RERENDER_MAIN_THREAD);
+		
+	}
 
 	@Override
 	public ActionResultType use(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand,
@@ -134,7 +143,9 @@ public class JunctionGateBlock extends Block {
 
 						}
 					}
-					world.setBlockAndUpdate(pos, newState);
+					world.setBlock(pos, newState, Constants.BlockFlags.DEFAULT_AND_RERENDER);
+					world.getBlockTicks().scheduleTick(pos, this, Constants.BlockFlags.DEFAULT_AND_RERENDER);
+					
 
 				}
 				dirs.clear();

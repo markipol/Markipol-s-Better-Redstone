@@ -26,6 +26,8 @@ public class JunctionGateColor implements IBlockColor {
 		if (iLightReader.getBlockEntity(pos) instanceof JunctionGateTileEntity) {
 			//Misc.log("Does it show, that is the question");
 			JunctionGateTileEntity jgte = (JunctionGateTileEntity) iLightReader.getBlockEntity(pos);
+			
+			
 
 
 
