@@ -31,7 +31,7 @@ public class JunctionGateTileEntity extends TileEntity{
 	public boolean eastIO = false;
 	public boolean southIO = false;
 	public boolean westIO = false;
-	public int power = 0;
+	public int power = 15;
 	public boolean update;
 
 	public JunctionGateTileEntity(TileEntityType<? extends TileEntity> type) {
@@ -41,6 +41,15 @@ public class JunctionGateTileEntity extends TileEntity{
 
 	public JunctionGateTileEntity() {
 		this(Reg.JUNCTION_GATE_TILE_ENTITY.get());
+	}
+	
+	public int getNumberOfInputs() {
+		int inputs = 0;
+		if (northVisible&&northIO) inputs++;
+		if (eastVisible&&eastIO) inputs++;
+		if (southVisible&&southIO) inputs++;
+		if (westVisible&&westIO) inputs++;
+		return inputs;
 	}
 
 	public List<Direction> getInputDirs() {
@@ -66,7 +75,7 @@ public class JunctionGateTileEntity extends TileEntity{
 //		if (this.level.isClientSide) {
 		    setChanged();
 		    update = true;
-			this.level.sendBlockUpdated(p, s, s, Constants.BlockFlags.DEFAULT_AND_RERENDER );
+			this.level.sendBlockUpdated(p, s, s, Constants.BlockFlags.BLOCK_UPDATE + Constants.BlockFlags.NOTIFY_NEIGHBORS );
 			
 			//this.level.markAndNotifyBlock(p, this.level.getChunkAt(p), s, s, 2, 2);
 			
@@ -147,6 +156,11 @@ public class JunctionGateTileEntity extends TileEntity{
 		if (d == Direction.WEST)
 			westIO = IO;
 	}
+	
+	public int getPowerAndUpdate() {
+		update = true;
+		return power;
+	}
 
 
 	public List<Direction> getOutputDirs() {
@@ -175,6 +189,9 @@ public class JunctionGateTileEntity extends TileEntity{
 		load(state, pkt.getTag());
 		if (update==true) {
 			level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Constants.BlockFlags.BLOCK_UPDATE + Constants.BlockFlags.NOTIFY_NEIGHBORS );
+			level.updateNeighborsAt(getBlockPos(), level.getBlockState(getBlockPos()).getBlock());
+			level.updateNeighbourForOutputSignal(getBlockPos(), level.getBlockState(getBlockPos()).getBlock());
+			
 			update = false;
 		}
 

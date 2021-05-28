@@ -39,7 +39,7 @@ public class JunctionGateBlock extends Block {
 	public static final BooleanProperty SOUTH_VISIBLE = BooleanProperty.create("south_visible");
 	public static final BooleanProperty WEST_VISIBLE = BooleanProperty.create("west_visible");
 	public static List<DistanceToEdge> dirs = new ArrayList<DistanceToEdge>();
-	private Mode modes[] = new Mode[]{Mode.NONE, Mode.NONE, Mode.NONE, Mode.NONE};
+	private Mode modes[] = new Mode[] { Mode.NONE, Mode.NONE, Mode.NONE, Mode.NONE };
 
 	DecimalFormat df = new DecimalFormat("###.##");
 	public static final VoxelShape HITBOX = VoxelShapes.join(Block.box(0, 0, 0, 16, 1, 16),
@@ -126,9 +126,11 @@ public class JunctionGateBlock extends Block {
 					BlockState newState = state;
 
 					if (!jgte.getVisibleFromDir(side)) {
-
-						newState = jgte.setVisibleAndIO(side, pos, true, state, true);
-
+						if (jgte.getNumberOfInputs() == 0) {
+							newState = jgte.setVisibleAndIO(side, pos, true, state, true);
+						} else {
+							newState = jgte.setVisibleAndIO(side, pos, false, state, true);
+						}
 					} else {
 						if (jgte.getIOFromDir(side)) {
 
@@ -140,11 +142,6 @@ public class JunctionGateBlock extends Block {
 						}
 					}
 					world.setBlock(pos, newState, Constants.BlockFlags.DEFAULT_AND_RERENDER);
-					
-					
-					
-					
-					
 
 				}
 				dirs.clear();
@@ -185,10 +182,38 @@ public class JunctionGateBlock extends Block {
 					        + ", South V: " + southV + "IO: " + southIO + ", West V: " + westV + "IO: " + westIO);
 				}
 			}
-			world.setBlockAndUpdate(pos, state);
+			
 		}
-		
+
 		return ActionResultType.SUCCESS;
+	}
+
+	@Override
+	public int getSignal(BlockState state, IBlockReader reader, BlockPos pos, Direction directionFromNeighborToThis) {
+		Direction actualDirection = directionFromNeighborToThis.getOpposite();
+		JunctionGateTileEntity jgte = new JunctionGateTileEntity();
+		if (reader.getBlockEntity(pos) instanceof JunctionGateTileEntity) {
+
+			jgte = (JunctionGateTileEntity) reader.getBlockEntity(pos);
+			BlockState newState = state;
+			if (actualDirection == Direction.UP || actualDirection == Direction.DOWN) {
+				return 0;
+			} else {
+				if (!jgte.getIOFromDir(actualDirection) && jgte.getVisibleFromDir(actualDirection)) {
+					Misc.log("Power requested from Tile Entity");
+					
+					return jgte.getPowerAndUpdate();
+
+				}
+			}
+		}
+		return 0;
+	}
+
+	@Override
+	public boolean isSignalSource(BlockState p_149744_1_) {
+
+		return true;
 	}
 
 	public static BooleanProperty dirToProperty(Direction d) {
@@ -206,30 +231,28 @@ public class JunctionGateBlock extends Block {
 //	public void toggleMode(Direction side) {
 //		switch (modes)
 //	}
-	
+
 	public enum Mode implements IStringSerializable {
-		NONE("none"),
-		INPUT("input"),
-		OUTPUT("output");
-		
+		NONE("none"), INPUT("input"), OUTPUT("output");
+
 		private final String name;
-		
+
 		Mode(String name) {
 			this.name = name;
 		}
 
 		@Override
 		public String getSerializedName() {
-			
+
 			return name;
 		}
-		
+
 		@Override
 		public String toString() {
-			
+
 			return getSerializedName();
 		}
-		
+
 	}
 
 }
