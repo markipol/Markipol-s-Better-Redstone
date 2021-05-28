@@ -1,5 +1,7 @@
 package com.markipol.markisbetterredstone.common.blocks.magic_block;
 
+import com.markipol.markisbetterredstone.Reg;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
@@ -33,7 +35,7 @@ public class MagicBlock extends Block {
 	@Override
 	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
 		
-		return new MagicBlockTileEntity();
+		return Reg.MAGIC_BLOCK_TILE_ENTITY.get().create();
 	}
 	
 

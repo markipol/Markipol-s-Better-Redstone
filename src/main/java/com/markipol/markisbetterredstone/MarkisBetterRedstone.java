@@ -4,16 +4,19 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.markipol.markisbetterredstone.common.blocks.colored_lamp.LampColor;
+
 import com.markipol.markisbetterredstone.common.blocks.junction_gate.JunctionGateColor;
 import com.markipol.markisbetterredstone.common.blocks.magic_block.MagicBlockTER;
-import com.markipol.markisbetterredstone.util.Misc;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.RenderTypeLookup;
 import net.minecraft.client.renderer.texture.AtlasTexture;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ColorHandlerEvent;
+import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
+import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -56,9 +59,10 @@ public class MarkisBetterRedstone
     private void clientSetup(final FMLClientSetupEvent event) {
     	RenderTypeLookup.setRenderLayer(Reg.COLORED_LAMP_BLOCK.get(), RenderType.cutoutMipped());
     	ClientRegistry.bindTileEntityRenderer(Reg.MAGIC_BLOCK_TILE_ENTITY.get(), MagicBlockTER::new);
-    	Misc.log("I mean something's happening, not going to pretend what");
+    	
 
     	RenderTypeLookup.setRenderLayer(Reg.JUNCTION_GATE_BLOCK.get(), RenderType.translucent());
+//    	RenderTypeLookup.setRenderLayer(Reg.FANCY_BLOCK.get(), (RenderType) -> true);
     }
     
     
@@ -66,6 +70,10 @@ public class MarkisBetterRedstone
     	event.getBlockColors().register(new LampColor(), Reg.COLORED_LAMP_BLOCK.get());
     	event.getBlockColors().register(new JunctionGateColor(), Reg.JUNCTION_GATE_BLOCK.get());
     	
+    }
+    
+    public void onModelRegistryEvent (ModelRegistryEvent event) {
+//    	ModelLoaderRegistry.registerLoader(new ResourceLocation(id, "fancy_loader"), new FancyModelLoader());
     }
 
     

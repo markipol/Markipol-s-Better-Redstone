@@ -19,7 +19,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
 
-public class JunctionGateTileEntity extends TileEntity implements ITickable{
+public class JunctionGateTileEntity extends TileEntity{
 	public List<Direction> inputDirs = new ArrayList<Direction>();
 	public List<Direction> outputDirs = new ArrayList<Direction>();
 	public boolean northVisible = false;
@@ -65,8 +65,10 @@ public class JunctionGateTileEntity extends TileEntity implements ITickable{
 	public void sW(BlockPos p, BlockState s) {
 //		if (this.level.isClientSide) {
 		    setChanged();
+		    update = true;
 			this.level.sendBlockUpdated(p, s, s, Constants.BlockFlags.DEFAULT_AND_RERENDER );
-			this.level.markAndNotifyBlock(p, this.level.getChunkAt(p), s, s, 2, 2);
+			
+			//this.level.markAndNotifyBlock(p, this.level.getChunkAt(p), s, s, 2, 2);
 			
 			
 
@@ -162,14 +164,19 @@ public class JunctionGateTileEntity extends TileEntity implements ITickable{
 	public SUpdateTileEntityPacket getUpdatePacket() {
 
 		CompoundNBT nbt = getUpdateTag();
-		return new SUpdateTileEntityPacket(this.getBlockPos(), -1, nbt);
+		return new SUpdateTileEntityPacket(this.getBlockPos(), 1, nbt);
 	}
 
 	@Override
 	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
 
 		BlockState state = level.getBlockState(getBlockPos());
+		
 		load(state, pkt.getTag());
+		if (update==true) {
+			level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Constants.BlockFlags.BLOCK_UPDATE + Constants.BlockFlags.NOTIFY_NEIGHBORS );
+			update = false;
+		}
 
 	}
 
@@ -237,12 +244,6 @@ public class JunctionGateTileEntity extends TileEntity implements ITickable{
 
 	}
 
-	@Override
-	public void tick() {
-		if (update && !this.level.isClientSide) {
-			this.level.setBlock(getBlockPos(), getBlockState(), Constants.BlockFlags.DEFAULT_AND_RERENDER);
-			update = false;
-		}
-	}
+
 
 }

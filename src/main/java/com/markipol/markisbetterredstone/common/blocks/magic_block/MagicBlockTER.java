@@ -42,6 +42,7 @@ public class MagicBlockTER extends TileEntityRenderer<MagicBlockTileEntity> {
 		.color(1.0f, 1.0f, 1.0f, 1.0f)
 		.uv(u, v)
 		.uv2(0, 240)
+		.normal(1, 0, 0)
 		.endVertex();
 	}
 

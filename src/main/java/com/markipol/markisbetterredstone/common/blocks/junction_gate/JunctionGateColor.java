@@ -17,8 +17,8 @@ public class JunctionGateColor implements IBlockColor {
 	public JunctionGateTileEntity jgte;
 	public List<Direction> inputDirs = new ArrayList<Direction>();
 	public List<Direction> outputDirs = new ArrayList<Direction>();
-	public static final int BLUE = new Color(252, 186, 3).getRGB();
-	public static final int ORANGE = new Color(3, 186, 252).getRGB();
+	public static final int BLUE = new Color(3, 111, 252).getRGB();
+	public static final int ORANGE = new Color(252, 186, 3).getRGB();
 	
 
 	@Override
@@ -51,7 +51,7 @@ public class JunctionGateColor implements IBlockColor {
 				    }
 				    	 
 				}
-				else return new Color(12, 240, 42).getRGB();
+				else return BLUE;
 				//Misc.log("Purple");
 
 
@@ -61,21 +61,21 @@ public class JunctionGateColor implements IBlockColor {
 				if (jgte.getVisibleFromDir(Direction.EAST)) {
 					return jgte.getIOFromDir(Direction.EAST) ? BLUE : ORANGE;
 				}
-				else return new Color(12, 240, 42).getRGB();
+				else return BLUE;
 			}
 			// South IO
 			if (tintindex == 3) {
 				if (jgte.getVisibleFromDir(Direction.SOUTH)) {
 					return jgte.getIOFromDir(Direction.SOUTH) ? BLUE : ORANGE;
 				}
-				else return new Color(12, 240, 42).getRGB();
+				else return BLUE;
 			}
 			// West IO
 			if (tintindex == 4) {
 				if (jgte.getVisibleFromDir(Direction.WEST)) {
 					return jgte.getIOFromDir(Direction.WEST) ? BLUE : ORANGE;
 				}
-				else return new Color(12, 240, 42).getRGB();
+				else return BLUE;
 
 			}
 		}
