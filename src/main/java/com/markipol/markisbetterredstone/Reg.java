@@ -5,6 +5,8 @@ import com.markipol.markisbetterredstone.common.blocks.colored_lamp.ColoredLampB
 import com.markipol.markisbetterredstone.common.blocks.colored_lamp.ColoredLampTileEntity;
 import com.markipol.markisbetterredstone.common.blocks.junction_gate.JunctionGateBlock;
 import com.markipol.markisbetterredstone.common.blocks.junction_gate.JunctionGateTileEntity;
+import com.markipol.markisbetterredstone.common.blocks.magic_block.MagicBlock;
+import com.markipol.markisbetterredstone.common.blocks.magic_block.MagicBlockTileEntity;
 
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
@@ -38,12 +40,15 @@ public class Reg {
 	        () -> new ColoredLampBlock());
 	public static final RegistryObject<Block> JUNCTION_GATE_BLOCK = BLOCKS.register("junction_gate",
 	        () -> new JunctionGateBlock(AbstractBlock.Properties.of(Material.WOOL).harvestTool(ToolType.PICKAXE).harvestLevel(-1).sound(SoundType.ANVIL).noOcclusion()));
-
+	public static final RegistryObject<Block> MAGIC_BLOCK = BLOCKS.register("magic_block",
+	        () -> new MagicBlock());
 	// Items
 	public static final RegistryObject<Item> CORNER_GATE_ITEM = ITEMS.register("corner_gate",
 	        () -> new BlockItem(CORNER_GATE_BLOCK.get(), new Item.Properties().tab(ItemGroup.TAB_REDSTONE)));
 	public static final RegistryObject<Item> COLORED_LAMP_ITEM = ITEMS.register("colored_lamp",
 	        () -> new BlockItem(COLORED_LAMP_BLOCK.get(), new Item.Properties().tab(ItemGroup.TAB_REDSTONE)));
+	public static final RegistryObject<Item> MAGIC_BLOCK_ITEM = ITEMS.register("magic_block",
+	        () -> new BlockItem(MAGIC_BLOCK.get(), new Item.Properties().tab(ItemGroup.TAB_REDSTONE)));
 	
 	public static final RegistryObject<Item> JUNCTION_GATE_ITEM = ITEMS.register("junction_gate",
 	        () -> new BlockItem(JUNCTION_GATE_BLOCK.get(), new Item.Properties().tab(ItemGroup.TAB_REDSTONE)));
@@ -52,5 +57,7 @@ public class Reg {
 			() -> TileEntityType.Builder.of(ColoredLampTileEntity::new,  COLORED_LAMP_BLOCK.get()).build(null));
 	public static final RegistryObject<TileEntityType<JunctionGateTileEntity>> JUNCTION_GATE_TILE_ENTITY = TILE_ENTITY_TYPES.register("junction_gate", 
 			() -> TileEntityType.Builder.of(JunctionGateTileEntity::new,  JUNCTION_GATE_BLOCK.get()).build(null));
+	public static final RegistryObject<TileEntityType<MagicBlockTileEntity>> MAGIC_BLOCK_TILE_ENTITY = TILE_ENTITY_TYPES.register("magic_block", 
+			() -> TileEntityType.Builder.of(MagicBlockTileEntity::new,  JUNCTION_GATE_BLOCK.get()).build(null));
 
 }

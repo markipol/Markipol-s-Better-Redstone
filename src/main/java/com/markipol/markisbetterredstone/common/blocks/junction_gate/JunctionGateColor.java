@@ -19,6 +19,7 @@ public class JunctionGateColor implements IBlockColor {
 	public List<Direction> outputDirs = new ArrayList<Direction>();
 	public static final int BLUE = new Color(252, 186, 3).getRGB();
 	public static final int ORANGE = new Color(3, 186, 252).getRGB();
+	
 
 	@Override
 	public int getColor(BlockState state, IBlockDisplayReader iLightReader, BlockPos pos, int tintindex) {

@@ -1,0 +1,7 @@
+{
+    "comment":"This is not visible, rendering handled by MagicBlockTER",
+    "parent": "block/cube_all",
+    "textures": {
+        "all": "markisbetterredstone:block/magic_block"
+    }
+}

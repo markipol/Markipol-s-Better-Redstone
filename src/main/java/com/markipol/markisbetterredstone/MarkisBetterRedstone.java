@@ -5,15 +5,20 @@ import org.apache.logging.log4j.Logger;
 
 import com.markipol.markisbetterredstone.common.blocks.colored_lamp.LampColor;
 import com.markipol.markisbetterredstone.common.blocks.junction_gate.JunctionGateColor;
+import com.markipol.markisbetterredstone.common.blocks.magic_block.MagicBlockTER;
+import com.markipol.markisbetterredstone.util.Misc;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.RenderTypeLookup;
+import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraftforge.client.event.ColorHandlerEvent;
+import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -33,6 +38,7 @@ public class MarkisBetterRedstone
         bus.addListener(this::commonSetup);
         bus.addListener(this::onColorHandlerEvent);
         bus.addListener(this::clientSetup);
+        
         Reg.BLOCKS.register(bus);
         Reg.ITEMS.register(bus);
         Reg.TILE_ENTITY_TYPES.register(bus);
@@ -49,6 +55,8 @@ public class MarkisBetterRedstone
 
     private void clientSetup(final FMLClientSetupEvent event) {
     	RenderTypeLookup.setRenderLayer(Reg.COLORED_LAMP_BLOCK.get(), RenderType.cutoutMipped());
+    	ClientRegistry.bindTileEntityRenderer(Reg.MAGIC_BLOCK_TILE_ENTITY.get(), MagicBlockTER::new);
+    	Misc.log("I mean something's happening, not going to pretend what");
 
     	RenderTypeLookup.setRenderLayer(Reg.JUNCTION_GATE_BLOCK.get(), RenderType.translucent());
     }
@@ -57,8 +65,18 @@ public class MarkisBetterRedstone
     public void onColorHandlerEvent(ColorHandlerEvent.Block event) {
     	event.getBlockColors().register(new LampColor(), Reg.COLORED_LAMP_BLOCK.get());
     	event.getBlockColors().register(new JunctionGateColor(), Reg.JUNCTION_GATE_BLOCK.get());
+    	
     }
 
+    
+    @SuppressWarnings("deprecation")
+    @SubscribeEvent
+	public static void onTextureStitch(TextureStitchEvent.Pre event) {
+    	if (!event.getMap().location().equals(AtlasTexture.LOCATION_BLOCKS)) {
+    		return;
+    	}
+    	event.addSprite(MagicBlockTER.TEXTURE);
+    }
 
     // You can use SubscribeEvent and let the Event Bus discover methods to call
     @SubscribeEvent

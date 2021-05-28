@@ -21,6 +21,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
+import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.shapes.IBooleanFunction;
@@ -38,6 +39,7 @@ public class JunctionGateBlock extends Block {
 	public static final BooleanProperty SOUTH_VISIBLE = BooleanProperty.create("south_visible");
 	public static final BooleanProperty WEST_VISIBLE = BooleanProperty.create("west_visible");
 	public static List<DistanceToEdge> dirs = new ArrayList<DistanceToEdge>();
+	private Mode modes[] = new Mode[]{Mode.NONE, Mode.NONE, Mode.NONE, Mode.NONE};
 
 	DecimalFormat df = new DecimalFormat("###.##");
 	public static final VoxelShape HITBOX = VoxelShapes.join(Block.box(0, 0, 0, 16, 1, 16),
@@ -95,12 +97,6 @@ public class JunctionGateBlock extends Block {
 			jgte.outputDirs.clear();
 		}
 	}
-	@Override
-	public void tick(BlockState state, ServerWorld sWorld, BlockPos pos, Random p_225534_4_) {
-		sWorld.setBlock(pos, state, Constants.BlockFlags.BLOCK_UPDATE + Constants.BlockFlags.NOTIFY_NEIGHBORS + Constants.BlockFlags.RERENDER_MAIN_THREAD);
-		sWorld.markAndNotifyBlock(pos, sWorld.getChunkAt(pos), state, state, Constants.BlockFlags.BLOCK_UPDATE + Constants.BlockFlags.NOTIFY_NEIGHBORS + Constants.BlockFlags.RERENDER_MAIN_THREAD, Constants.BlockFlags.BLOCK_UPDATE + Constants.BlockFlags.NOTIFY_NEIGHBORS + Constants.BlockFlags.RERENDER_MAIN_THREAD);
-		
-	}
 
 	@Override
 	public ActionResultType use(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand,
@@ -144,7 +140,10 @@ public class JunctionGateBlock extends Block {
 						}
 					}
 					world.setBlock(pos, newState, Constants.BlockFlags.DEFAULT_AND_RERENDER);
-					world.getBlockTicks().scheduleTick(pos, this, Constants.BlockFlags.DEFAULT_AND_RERENDER);
+					
+					
+					
+					
 					
 
 				}
@@ -202,6 +201,35 @@ public class JunctionGateBlock extends Block {
 		if (d == Direction.WEST)
 			return WEST_VISIBLE;
 		return NORTH_VISIBLE;
+	}
+//	
+//	public void toggleMode(Direction side) {
+//		switch (modes)
+//	}
+	
+	public enum Mode implements IStringSerializable {
+		NONE("none"),
+		INPUT("input"),
+		OUTPUT("output");
+		
+		private final String name;
+		
+		Mode(String name) {
+			this.name = name;
+		}
+
+		@Override
+		public String getSerializedName() {
+			
+			return name;
+		}
+		
+		@Override
+		public String toString() {
+			
+			return getSerializedName();
+		}
+		
 	}
 
 }

@@ -21,6 +21,7 @@ public class LampColor implements net.minecraft.client.renderer.color.IBlockColo
 			//Misc.log("The tile entity's wheels are turning");
 			return ColoredLampBlock.getRGBFromTE(clte);
 		}
+		
 		return new Color(255,255,255).getRGB();
 	}
 

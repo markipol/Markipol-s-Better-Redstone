@@ -8,6 +8,7 @@ import javax.annotation.Nullable;
 import com.markipol.markisbetterredstone.Reg;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.client.renderer.texture.ITickable;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
@@ -18,7 +19,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
 
-public class JunctionGateTileEntity extends TileEntity {
+public class JunctionGateTileEntity extends TileEntity implements ITickable{
 	public List<Direction> inputDirs = new ArrayList<Direction>();
 	public List<Direction> outputDirs = new ArrayList<Direction>();
 	public boolean northVisible = false;
@@ -31,6 +32,7 @@ public class JunctionGateTileEntity extends TileEntity {
 	public boolean southIO = false;
 	public boolean westIO = false;
 	public int power = 0;
+	public boolean update;
 
 	public JunctionGateTileEntity(TileEntityType<? extends TileEntity> type) {
 		super(type);
@@ -61,11 +63,14 @@ public class JunctionGateTileEntity extends TileEntity {
 
 	//sW stands for Sync World (between server and client)
 	public void sW(BlockPos p, BlockState s) {
-		if (!this.level.isClientSide) {
+//		if (this.level.isClientSide) {
+		    setChanged();
 			this.level.sendBlockUpdated(p, s, s, Constants.BlockFlags.DEFAULT_AND_RERENDER );
+			this.level.markAndNotifyBlock(p, this.level.getChunkAt(p), s, s, 2, 2);
+			
 			
 
-		}
+//		}
 	}
 
 	public void setIO(Direction d, BlockPos p, boolean inputOrOutput, BlockState s) {
@@ -157,7 +162,7 @@ public class JunctionGateTileEntity extends TileEntity {
 	public SUpdateTileEntityPacket getUpdatePacket() {
 
 		CompoundNBT nbt = getUpdateTag();
-		return new SUpdateTileEntityPacket(this.getBlockPos(), 6, nbt);
+		return new SUpdateTileEntityPacket(this.getBlockPos(), -1, nbt);
 	}
 
 	@Override
@@ -181,6 +186,9 @@ public class JunctionGateTileEntity extends TileEntity {
 
 		this.load(state, tag);
 	}
+	public void setUpdate() {
+		update = true;
+	}
 
 	@Override
 	public CompoundNBT save(CompoundNBT parentNBT) {
@@ -202,6 +210,7 @@ public class JunctionGateTileEntity extends TileEntity {
 
 		parentNBT.put("visibles", visibles);
 		parentNBT.put("io", io);
+		parentNBT.putBoolean("update", update);
 
 		return parentNBT;
 	}
@@ -223,8 +232,17 @@ public class JunctionGateTileEntity extends TileEntity {
 		eastIO = io.getBoolean("east");
 		southIO = io.getBoolean("south");
 		westIO = io.getBoolean("west");
+		update = parentNBT.getBoolean("update");
 
 
+	}
+
+	@Override
+	public void tick() {
+		if (update && !this.level.isClientSide) {
+			this.level.setBlock(getBlockPos(), getBlockState(), Constants.BlockFlags.DEFAULT_AND_RERENDER);
+			update = false;
+		}
 	}
 
 }
