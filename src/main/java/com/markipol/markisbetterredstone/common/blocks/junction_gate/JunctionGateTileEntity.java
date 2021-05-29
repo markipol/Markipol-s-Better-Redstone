@@ -5,6 +5,9 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.markipol.markisbetterredstone.Reg;
 
 import net.minecraft.block.BlockState;
@@ -20,6 +23,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
 
 public class JunctionGateTileEntity extends TileEntity{
+	private static final Logger LOGGER = LogManager.getLogger();
 	public List<Direction> inputDirs = new ArrayList<Direction>();
 	public List<Direction> outputDirs = new ArrayList<Direction>();
 	public boolean northVisible = false;
@@ -31,16 +35,22 @@ public class JunctionGateTileEntity extends TileEntity{
 	public boolean eastIO = false;
 	public boolean southIO = false;
 	public boolean westIO = false;
-	public int power = 15;
+	public int power = 0;
 	public boolean update;
 
 	public JunctionGateTileEntity(TileEntityType<? extends TileEntity> type) {
 		super(type);
 
 	}
+	
+
 
 	public JunctionGateTileEntity() {
 		this(Reg.JUNCTION_GATE_TILE_ENTITY.get());
+	}
+	public void updatePower(int power, BlockState s, BlockPos p) {
+		this.power = power;
+		sW(p, s);
 	}
 	
 	public int getNumberOfInputs() {
@@ -53,9 +63,28 @@ public class JunctionGateTileEntity extends TileEntity{
 	}
 
 	public List<Direction> getInputDirs() {
+		inputDirs.clear();
+		if (northVisible&&northIO) inputDirs.add(Direction.NORTH);
+		if (eastVisible&&eastIO) inputDirs.add(Direction.EAST);
+		if (southVisible&&southIO) inputDirs.add(Direction.SOUTH);
+		if (westVisible&&westIO) inputDirs.add(Direction.WEST);
 
 		return inputDirs;
 	}
+	
+
+	
+	public List<Direction> getOutputDirs() {
+
+		outputDirs.clear();
+		if (northVisible&&!northIO) outputDirs.add(Direction.NORTH);
+		if (eastVisible&&!eastIO) outputDirs.add(Direction.EAST);
+		if (southVisible&&!southIO) outputDirs.add(Direction.SOUTH);
+		if (westVisible&&!westIO) outputDirs.add(Direction.WEST);
+
+		return outputDirs;
+	}
+
 
 	public boolean isInput(Direction d) {
 		return inputDirs.contains(d);
@@ -163,10 +192,7 @@ public class JunctionGateTileEntity extends TileEntity{
 	}
 
 
-	public List<Direction> getOutputDirs() {
-
-		return outputDirs;
-	}
+	
 
 	public int getPower() {
 
@@ -189,8 +215,8 @@ public class JunctionGateTileEntity extends TileEntity{
 		load(state, pkt.getTag());
 		if (update==true) {
 			level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Constants.BlockFlags.BLOCK_UPDATE + Constants.BlockFlags.NOTIFY_NEIGHBORS );
-			level.updateNeighborsAt(getBlockPos(), level.getBlockState(getBlockPos()).getBlock());
-			level.updateNeighbourForOutputSignal(getBlockPos(), level.getBlockState(getBlockPos()).getBlock());
+			
+			
 			
 			update = false;
 		}

@@ -1,12 +1,9 @@
 package com.markipol.markisbetterredstone.common.blocks.junction_gate;
 
-import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
-
 import com.markipol.markisbetterredstone.util.Misc;
 
 import net.minecraft.block.Block;
@@ -16,7 +13,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.StateContainer.Builder;
-import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
@@ -30,7 +26,6 @@ import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.util.Constants;
 
 public class JunctionGateBlock extends Block {
@@ -127,17 +122,25 @@ public class JunctionGateBlock extends Block {
 
 					if (!jgte.getVisibleFromDir(side)) {
 						if (jgte.getNumberOfInputs() == 0) {
+							// Go from not visible to input if there are 0 current inputs
 							newState = jgte.setVisibleAndIO(side, pos, true, state, true);
+							recalculatePower(jgte, world, pos);
+							updateOutputSides(newState, world, pos, jgte);
 						} else {
+							// Go from not visible to output if there are 1 or more current inputs
 							newState = jgte.setVisibleAndIO(side, pos, false, state, true);
+							updateOutputSides(newState, world, pos, jgte);
 						}
 					} else {
 						if (jgte.getIOFromDir(side)) {
-
+							// Go from visible and input to visible and output
 							newState = jgte.setVisibleAndIO(side, pos, false, state, true);
+							recalculatePower(jgte, world, pos);
+							updateOutputSides(newState, world, pos, jgte);
 						} else {
-
+							// Go from visible and output to invisible
 							newState = jgte.setVisibleAndIO(side, pos, false, state, false);
+							updateOutputSides(newState, world, pos, jgte);
 
 						}
 					}
@@ -182,10 +185,43 @@ public class JunctionGateBlock extends Block {
 					        + ", South V: " + southV + "IO: " + southIO + ", West V: " + westV + "IO: " + westIO);
 				}
 			}
-			
+
 		}
 
 		return ActionResultType.SUCCESS;
+	}
+
+	public void updateNeighbours(BlockState state, World world, BlockPos pos) {
+		Misc.log("updateNeighbours");
+
+		world.updateNeighborsAt(pos, this);
+
+	}
+
+	public void recalculatePower(JunctionGateTileEntity jgte, World world, BlockPos pos) {
+		List<Direction> inputDirs = jgte.getInputDirs();
+		if (inputDirs.size() == 1) {
+			int power = world.getSignal(pos.relative(inputDirs.get(0)), inputDirs.get(0));
+//			Misc.log(inputDirs.get(0).toString() + ", Power: "
+//			        + world.getSignal(pos.relative(inputDirs.get(0)), inputDirs.get(0)) + " at pos: "
+//			        + pos.relative(inputDirs.get(0)).getX() + ", " + pos.relative(inputDirs.get(0)).getY() + ", "
+//			        + pos.relative(inputDirs.get(0)).getZ());
+			jgte.updatePower(power, world.getBlockState(pos), pos);
+		} else
+			return;
+	}
+
+	public void updateOutputSides(BlockState state, World world, BlockPos gatePos, JunctionGateTileEntity jgte) {
+		for (Direction d : jgte.getOutputDirs()) {
+			updateSignalOnOneSide(state, world, gatePos, d);
+		}
+	}
+
+	public void updateSignalOnOneSide(BlockState state, World world, BlockPos gatePos, Direction dir) {
+		Misc.log("updateSignalOnOneNeighbor");
+		BlockPos neighbourPos = gatePos.relative(dir.getOpposite());
+		world.neighborChanged(neighbourPos, this, gatePos);
+		world.updateNeighborsAt(gatePos, this);
 	}
 
 	@Override
@@ -200,14 +236,27 @@ public class JunctionGateBlock extends Block {
 				return 0;
 			} else {
 				if (!jgte.getIOFromDir(actualDirection) && jgte.getVisibleFromDir(actualDirection)) {
-					Misc.log("Power requested from Tile Entity");
-					
+					//Misc.log("Power requested from Tile Entity");
+
 					return jgte.getPowerAndUpdate();
 
 				}
 			}
 		}
 		return 0;
+	}
+	
+	@Override
+	public void neighborChanged(BlockState state, World world, BlockPos pos, Block blockIn, BlockPos fromPos,
+	        boolean isMoving) {
+		JunctionGateTileEntity jgte = new JunctionGateTileEntity();
+		if (world.getBlockEntity(pos) instanceof JunctionGateTileEntity) {
+			jgte = (JunctionGateTileEntity) world.getBlockEntity(pos);
+			recalculatePower(jgte, world, pos);
+//			updateOutputSides(state, world, pos, jgte);
+		}
+		
+		return;
 	}
 
 	@Override
