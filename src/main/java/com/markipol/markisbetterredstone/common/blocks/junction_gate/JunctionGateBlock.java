@@ -25,6 +25,7 @@ import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IBlockReader;
+import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
 
@@ -55,6 +56,10 @@ public class JunctionGateBlock extends Block {
 	        ISelectionContext p_220053_4_) {
 
 		return HITBOX;
+	}
+	
+	public void sandbox() {
+		Direction[] dirs = Direction.values();
 	}
 
 	@Override
@@ -129,6 +134,7 @@ public class JunctionGateBlock extends Block {
 						} else {
 							// Go from not visible to output if there are 1 or more current inputs
 							newState = jgte.setVisibleAndIO(side, pos, false, state, true);
+							recalculatePower(jgte, world, pos);
 							updateOutputSides(newState, world, pos, jgte);
 						}
 					} else {
@@ -137,9 +143,11 @@ public class JunctionGateBlock extends Block {
 							newState = jgte.setVisibleAndIO(side, pos, false, state, true);
 							recalculatePower(jgte, world, pos);
 							updateOutputSides(newState, world, pos, jgte);
+
 						} else {
 							// Go from visible and output to invisible
 							newState = jgte.setVisibleAndIO(side, pos, false, state, false);
+							recalculatePower(jgte, world, pos);
 							updateOutputSides(newState, world, pos, jgte);
 
 						}
@@ -207,21 +215,84 @@ public class JunctionGateBlock extends Block {
 //			        + pos.relative(inputDirs.get(0)).getX() + ", " + pos.relative(inputDirs.get(0)).getY() + ", "
 //			        + pos.relative(inputDirs.get(0)).getZ());
 			jgte.updatePower(power, world.getBlockState(pos), pos);
-		} else
-			return;
+		} else if (inputDirs.size() == 0) {
+			jgte.updatePower(0, world.getBlockState(pos), pos);
+		} else {
+			Misc.warn(inputDirs.size() + " inputs on Junction Gate block at " + pos.toShortString()
+			        + ", should be 0 or 1");
+		}
+
+	}
+
+	@Override
+	public void neighborChanged(BlockState state, World world, BlockPos pos, Block blockIn, BlockPos fromPos,
+	        boolean isMoving) {
+		JunctionGateTileEntity jgte = new JunctionGateTileEntity();
+		if (world.getBlockEntity(pos) instanceof JunctionGateTileEntity) {
+			jgte = (JunctionGateTileEntity) world.getBlockEntity(pos);
+			recalculatePower(jgte, world, pos);
+			world.updateNeighborsAt(pos, this);
+			updateOutputSides(state, world, pos, jgte);
+		}
+
+		return;
 	}
 
 	public void updateOutputSides(BlockState state, World world, BlockPos gatePos, JunctionGateTileEntity jgte) {
-		for (Direction d : jgte.getOutputDirs()) {
-			updateSignalOnOneSide(state, world, gatePos, d);
+		for (Direction d : Direction.Plane.HORIZONTAL) {
+			//Misc.log("d =" + d.toString() +  ", getVisibleFromDir = " +  jgte.getVisibleFromDir(d)  + ", getIOFromDir = " + jgte.getIOFromDir(d) );
+			if (jgte.getVisibleFromDir(d) && !jgte.getIOFromDir(d))
+				//Misc.log(d.toString());
+				updateSignalOnOneSide(state, world, gatePos, d);
 		}
 	}
 
 	public void updateSignalOnOneSide(BlockState state, World world, BlockPos gatePos, Direction dir) {
-		Misc.log("updateSignalOnOneNeighbor");
-		BlockPos neighbourPos = gatePos.relative(dir.getOpposite());
+
+		BlockPos neighbourPos = gatePos.relative(dir);
+		Misc.log(dir.toString() + ", Pos: " + neighbourPos.toShortString() );
+		boolean whetherFullCube = world.getBlockState(neighbourPos).isRedstoneConductor(world, neighbourPos);
+		//Misc.log("neighbourPos = " + neighbourPos.toShortString() + ",  whetherFullCube = " + whetherFullCube);
+//		Misc.log("updateSignalOnOneSide: " + neighbourPos.toShortString() + " " + dir.getOpposite().toString() + ": "
+//		        + whetherFullCube);
 		world.neighborChanged(neighbourPos, this, gatePos);
 		world.updateNeighborsAt(gatePos, this);
+		if (whetherFullCube) {
+			//Misc.log("Will be updating neighbors of full cube " + neighbourPos.toShortString());
+			List<Direction> cubeNeighbourDirs = new ArrayList<Direction>();
+			for (Direction neighborDir : Direction.Plane.HORIZONTAL) {
+				//Misc.log("neighborDir = " + neighborDir.toString());
+				if (neighborDir != dir) {
+					//Misc.log("dir to update: " + neighborDir + "at pos" + neighbourPos.relative(neighborDir));
+					world.neighborChanged(neighbourPos.relative(neighborDir), this, neighbourPos);
+					//world.setBlock(neighbourPos.relative(neighborDir), world.getBlockState(neighbourPos.relative(neighborDir)), Constants.BlockFlags.BLOCK_UPDATE);
+				}
+			}
+		}
+//		world.updateNeighborsAtExceptFromFacing(neighbourPos, this, dir.getOpposite());
+	}
+
+	@Override
+	public int getDirectSignal(BlockState state, IBlockReader reader, BlockPos pos,
+	        Direction directionFromNeighborToThis) {
+		//Misc.log("getDirectSignal");
+		Direction actualDirection = directionFromNeighborToThis.getOpposite();
+		JunctionGateTileEntity jgte = new JunctionGateTileEntity();
+		if (reader.getBlockEntity(pos) instanceof JunctionGateTileEntity) {
+
+			jgte = (JunctionGateTileEntity) reader.getBlockEntity(pos);
+			if (actualDirection == Direction.UP || actualDirection == Direction.DOWN) {
+				return 0;
+			} else {
+				if (!jgte.getIOFromDir(actualDirection) && jgte.getVisibleFromDir(actualDirection)) {
+
+					return jgte.getPowerAndUpdate();
+
+				}
+			}
+
+		}
+		return 0;
 	}
 
 	@Override
@@ -236,7 +307,7 @@ public class JunctionGateBlock extends Block {
 				return 0;
 			} else {
 				if (!jgte.getIOFromDir(actualDirection) && jgte.getVisibleFromDir(actualDirection)) {
-					//Misc.log("Power requested from Tile Entity");
+					// Misc.log("Power requested from Tile Entity");
 
 					return jgte.getPowerAndUpdate();
 
@@ -245,18 +316,11 @@ public class JunctionGateBlock extends Block {
 		}
 		return 0;
 	}
-	
+
 	@Override
-	public void neighborChanged(BlockState state, World world, BlockPos pos, Block blockIn, BlockPos fromPos,
-	        boolean isMoving) {
-		JunctionGateTileEntity jgte = new JunctionGateTileEntity();
-		if (world.getBlockEntity(pos) instanceof JunctionGateTileEntity) {
-			jgte = (JunctionGateTileEntity) world.getBlockEntity(pos);
-			recalculatePower(jgte, world, pos);
-//			updateOutputSides(state, world, pos, jgte);
-		}
-		
-		return;
+	public boolean getWeakChanges(BlockState state, IWorldReader world, BlockPos pos) {
+
+		return true;
 	}
 
 	@Override
