@@ -14,10 +14,6 @@ public class Misc {
 	public static void log(String string) {
 		LogManager.getLogger().info(string);
 	}
-	
-	public static void warn(String string) {
-		LogManager.getLogger().warn(string);
-	}
 
 	public static float scale2scale(float x, float x1, float x2, float y1, float y2) {
 		if (x1 > x2) {
