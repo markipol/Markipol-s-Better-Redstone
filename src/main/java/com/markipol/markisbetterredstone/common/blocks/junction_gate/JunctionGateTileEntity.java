@@ -22,7 +22,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
 
-public class JunctionGateTileEntity extends TileEntity{
+public class JunctionGateTileEntity extends TileEntity {
 	private static final Logger LOGGER = LogManager.getLogger();
 	public List<Direction> inputDirs = new ArrayList<Direction>();
 	public List<Direction> outputDirs = new ArrayList<Direction>();
@@ -42,49 +42,57 @@ public class JunctionGateTileEntity extends TileEntity{
 		super(type);
 
 	}
-	
-
 
 	public JunctionGateTileEntity() {
 		this(Reg.JUNCTION_GATE_TILE_ENTITY.get());
 	}
+
 	public void updatePower(int power, BlockState s, BlockPos p) {
 		this.power = power;
 		sW(p, s);
 	}
-	
+
 	public int getNumberOfInputs() {
 		int inputs = 0;
-		if (northVisible&&northIO) inputs++;
-		if (eastVisible&&eastIO) inputs++;
-		if (southVisible&&southIO) inputs++;
-		if (westVisible&&westIO) inputs++;
+		if (northVisible && northIO)
+			inputs++;
+		if (eastVisible && eastIO)
+			inputs++;
+		if (southVisible && southIO)
+			inputs++;
+		if (westVisible && westIO)
+			inputs++;
 		return inputs;
 	}
 
 	public List<Direction> getInputDirs() {
 		inputDirs.clear();
-		if (northVisible&&northIO) inputDirs.add(Direction.NORTH);
-		if (eastVisible&&eastIO) inputDirs.add(Direction.EAST);
-		if (southVisible&&southIO) inputDirs.add(Direction.SOUTH);
-		if (westVisible&&westIO) inputDirs.add(Direction.WEST);
+		if (northVisible && northIO)
+			inputDirs.add(Direction.NORTH);
+		if (eastVisible && eastIO)
+			inputDirs.add(Direction.EAST);
+		if (southVisible && southIO)
+			inputDirs.add(Direction.SOUTH);
+		if (westVisible && westIO)
+			inputDirs.add(Direction.WEST);
 
 		return inputDirs;
 	}
-	
 
-	
 	public List<Direction> getOutputDirs() {
 
 		outputDirs.clear();
-		if (northVisible&&!northIO) outputDirs.add(Direction.NORTH);
-		if (eastVisible&&!eastIO) outputDirs.add(Direction.EAST);
-		if (southVisible&&!southIO) outputDirs.add(Direction.SOUTH);
-		if (westVisible&&!westIO) outputDirs.add(Direction.WEST);
+		if (northVisible && !northIO)
+			outputDirs.add(Direction.NORTH);
+		if (eastVisible && !eastIO)
+			outputDirs.add(Direction.EAST);
+		if (southVisible && !southIO)
+			outputDirs.add(Direction.SOUTH);
+		if (westVisible && !westIO)
+			outputDirs.add(Direction.WEST);
 
 		return outputDirs;
 	}
-
 
 	public boolean isInput(Direction d) {
 		return inputDirs.contains(d);
@@ -97,18 +105,15 @@ public class JunctionGateTileEntity extends TileEntity{
 	public boolean falseForOutputTrueForInput(Direction d) {
 		return getIOFromDir(d);
 	}
-	
 
-	//sW stands for Sync World (between server and client)
+	// sW stands for Sync World (between server and client)
 	public void sW(BlockPos p, BlockState s) {
 //		if (this.level.isClientSide) {
-		    setChanged();
-		    update = true;
-			this.level.sendBlockUpdated(p, s, s, Constants.BlockFlags.BLOCK_UPDATE + Constants.BlockFlags.NOTIFY_NEIGHBORS );
-			
-			//this.level.markAndNotifyBlock(p, this.level.getChunkAt(p), s, s, 2, 2);
-			
-			
+		setChanged();
+		update = true;
+		this.level.sendBlockUpdated(p, s, s, Constants.BlockFlags.BLOCK_UPDATE + Constants.BlockFlags.NOTIFY_NEIGHBORS);
+
+		// this.level.markAndNotifyBlock(p, this.level.getChunkAt(p), s, s, 2, 2);
 
 //		}
 	}
@@ -119,13 +124,14 @@ public class JunctionGateTileEntity extends TileEntity{
 		sW(p, s);
 	}
 
-	public BlockState setVisibleAndIO(Direction d, BlockPos p, boolean inputOrOutput, BlockState s, boolean whetherVisible) {
+	public BlockState setVisibleAndIO(Direction d, BlockPos p, boolean inputOrOutput, BlockState s,
+	        boolean whetherVisible) {
 
 		setVisibleFromDir(d, whetherVisible);
 		s = s.setValue(JunctionGateBlock.dirToProperty(d), whetherVisible);
 
 		setIOFromDir(d, inputOrOutput);
-		sW(p,s);
+		sW(p, s);
 		return s;
 
 	}
@@ -185,14 +191,11 @@ public class JunctionGateTileEntity extends TileEntity{
 		if (d == Direction.WEST)
 			westIO = IO;
 	}
-	
+
 	public int getPowerAndUpdate() {
 		update = true;
 		return power;
 	}
-
-
-	
 
 	public int getPower() {
 
@@ -211,13 +214,19 @@ public class JunctionGateTileEntity extends TileEntity{
 	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
 
 		BlockState state = level.getBlockState(getBlockPos());
-		
+
 		load(state, pkt.getTag());
-		if (update==true) {
-			level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Constants.BlockFlags.BLOCK_UPDATE + Constants.BlockFlags.NOTIFY_NEIGHBORS );
-			
-			
-			
+		if (update == true) {
+			level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(),
+			        Constants.BlockFlags.BLOCK_UPDATE + Constants.BlockFlags.NOTIFY_NEIGHBORS);
+			List<Direction> oD = getOutputDirs();
+			for (Direction d : oD) {
+//				level.sendBlockUpdated(getBlockPos().relative(d), level.getBlockState(getBlockPos().relative(d)),
+//				        level.getBlockState(getBlockPos().relative(d)), 3);
+//				level.neighborChanged(getBlockPos().relative(d),
+//				        level.getBlockState(getBlockPos().relative(d)).getBlock(), getBlockPos());
+			}
+
 			update = false;
 		}
 
@@ -236,6 +245,7 @@ public class JunctionGateTileEntity extends TileEntity{
 
 		this.load(state, tag);
 	}
+
 	public void setUpdate() {
 		update = true;
 	}
@@ -284,9 +294,6 @@ public class JunctionGateTileEntity extends TileEntity{
 		westIO = io.getBoolean("west");
 		update = parentNBT.getBoolean("update");
 
-
 	}
-
-
 
 }

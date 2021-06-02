@@ -4,6 +4,8 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
+
 import com.markipol.markisbetterredstone.util.Misc;
 
 import net.minecraft.block.Block;
@@ -26,6 +28,7 @@ import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.util.Constants;
 
 public class JunctionGateBlock extends Block {
@@ -125,22 +128,28 @@ public class JunctionGateBlock extends Block {
 							// Go from not visible to input if there are 0 current inputs
 							newState = jgte.setVisibleAndIO(side, pos, true, state, true);
 							recalculatePower(jgte, world, pos);
-							updateOutputSides(newState, world, pos, jgte);
+							 updateOutputSides(newState, world, pos, jgte);
+							//world.getBlockTicks().scheduleTick(pos, this, 1);
 						} else {
 							// Go from not visible to output if there are 1 or more current inputs
 							newState = jgte.setVisibleAndIO(side, pos, false, state, true);
-							updateOutputSides(newState, world, pos, jgte);
+							recalculatePower(jgte, world, pos);
+							 updateOutputSides(newState, world, pos, jgte);
+							//world.getBlockTicks().scheduleTick(pos, this, 1);
 						}
 					} else {
 						if (jgte.getIOFromDir(side)) {
 							// Go from visible and input to visible and output
 							newState = jgte.setVisibleAndIO(side, pos, false, state, true);
 							recalculatePower(jgte, world, pos);
-							updateOutputSides(newState, world, pos, jgte);
+							 updateOutputSides(newState, world, pos, jgte);
+							//world.getBlockTicks().scheduleTick(pos, this, 1);
 						} else {
 							// Go from visible and output to invisible
 							newState = jgte.setVisibleAndIO(side, pos, false, state, false);
+							recalculatePower(jgte, world, pos);
 							updateOutputSides(newState, world, pos, jgte);
+							//world.getBlockTicks().scheduleTick(pos, this, 1);
 
 						}
 					}
@@ -198,6 +207,13 @@ public class JunctionGateBlock extends Block {
 
 	}
 
+	@Override
+	public int getDirectSignal(BlockState state, IBlockReader reader, BlockPos pos,
+	        Direction directionFromNeighborToThis) {
+
+		return state.getSignal(reader, pos, directionFromNeighborToThis);
+	}
+
 	public void recalculatePower(JunctionGateTileEntity jgte, World world, BlockPos pos) {
 		List<Direction> inputDirs = jgte.getInputDirs();
 		if (inputDirs.size() == 1) {
@@ -211,11 +227,42 @@ public class JunctionGateBlock extends Block {
 			return;
 	}
 
+
+	@Override
+	public void tick(BlockState state, ServerWorld world, BlockPos pos, Random rand) {
+		if (world.getBlockEntity(pos) instanceof JunctionGateTileEntity) {
+			// Misc.log("So it exists, at least...");
+			JunctionGateTileEntity jgte = (JunctionGateTileEntity) world.getBlockEntity(pos);
+
+			world.updateNeighborsAt(pos, this);
+			for (Direction d : jgte.getOutputDirs()) {
+				// updateSignalOnOneSide(state, world, gatePos, d);
+				if (world.getBlockState(pos.relative(d)).isRedstoneConductor(world, pos.relative(d))) {
+					Misc.log(d.toString() + " Block is a full cube redstone conductor");
+//					world.sendBlockUpdated(pos.relative(d), world.getBlockState(pos.relative(d)), world.getBlockState(pos.relative(d)), 
+//							Constants.BlockFlags.BLOCK_UPDATE + Constants.BlockFlags.NOTIFY_NEIGHBORS);
+
+//					for (Direction d2 : Direction.Plane.HORIZONTAL) {
+//						if (d2 != d.getOpposite()) {
+//							Misc.log(d2.toString());
+//							world.sendBlockUpdated(pos.relative(d).relative(d2),
+//							        world.getBlockState(pos.relative(d).relative(d2)),
+//							        world.getBlockState(pos.relative(d).relative(d2)), 2);
+//						}
+//					}
+//					world.updateNeighborsAtExceptFromFacing(pos.relative(d),
+//					        world.getBlockState(pos.relative(d)).getBlock(), d.getOpposite());
+				}
+			}
+		}
+	}
+
 	public void updateOutputSides(BlockState state, World world, BlockPos gatePos, JunctionGateTileEntity jgte) {
 		for (Direction d : jgte.getOutputDirs()) {
 			updateSignalOnOneSide(state, world, gatePos, d);
 		}
 	}
+
 
 	public void updateSignalOnOneSide(BlockState state, World world, BlockPos gatePos, Direction dir) {
 		Misc.log("updateSignalOnOneNeighbor");
@@ -236,7 +283,7 @@ public class JunctionGateBlock extends Block {
 				return 0;
 			} else {
 				if (!jgte.getIOFromDir(actualDirection) && jgte.getVisibleFromDir(actualDirection)) {
-					//Misc.log("Power requested from Tile Entity");
+					// Misc.log("Power requested from Tile Entity");
 
 					return jgte.getPowerAndUpdate();
 
@@ -245,7 +292,7 @@ public class JunctionGateBlock extends Block {
 		}
 		return 0;
 	}
-	
+
 	@Override
 	public void neighborChanged(BlockState state, World world, BlockPos pos, Block blockIn, BlockPos fromPos,
 	        boolean isMoving) {
@@ -254,8 +301,9 @@ public class JunctionGateBlock extends Block {
 			jgte = (JunctionGateTileEntity) world.getBlockEntity(pos);
 			recalculatePower(jgte, world, pos);
 //			updateOutputSides(state, world, pos, jgte);
+			world.getBlockTicks().scheduleTick(pos, this, 0);
 		}
-		
+
 		return;
 	}
 
